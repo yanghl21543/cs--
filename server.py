@@ -6,8 +6,8 @@ contacts = {
 }
 
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server_socket.bind(('localhost', 18080))  # 使用localhost作为服务器地址
-server_socket.listen(1)
+server_socket.bind(('localhost', 8888))  # 使用localhost作为服务器地址
+server_socket.listen(3)
 
 print("Server is running...")
 while True:
@@ -36,4 +36,18 @@ while True:
         else:
             response = "\n".join([f"{name}: {info['address']} {info['phone']}" for name, info in contacts.items()])
         conn.send(response.encode())
+    elif command == "ADD":
+        name, address, phone = args
+        if name in contacts:
+            conn.send("Contact already exists.".encode())
+        else:
+            contacts[name] = {"address": address, "phone": phone}
+            conn.send("Contact added successfully.".encode())
+    elif command == "DELETE":
+        name = args[0]
+        if name in contacts:
+            del contacts[name]
+            conn.send("Contact deleted successfully.".encode())
+        else:
+            conn.send("Contact not found.".encode())
     conn.close()
